@@ -112,7 +112,9 @@ $("commandForm").onsubmit=async e=>{
     if(c==="help"){line("Команды Cloud Linux:\\nhelp — справка\\nstatus — состояние API и репозитория\\nruns — последние запуски Actions\\nrun — полная диагностика\\nrun storage — проверка дисков и рабочей папки\\nrun runtime — сведения об ОС, ядре и среде выполнения\\nclear — очистить вывод\\nПроизвольный shell и sudo не поддерживаются.");return}
     if(c==="status"){const h=await request("/api/health");line(JSON.stringify(h,null,2));return}
     if(c==="runs"){await refresh();return}
-    if(c==="run"||c==="run full"){await run("full");return}\n    if(c==="run storage"){await run("storage");return}\n    if(c==="run runtime"){await run("runtime");return}
+    if(c==="run"||c==="run full"){await run("full");return}
+    if(c==="run storage"){await run("storage");return}
+    if(c==="run runtime"){await run("runtime");return}
     line("Неизвестная команда. Разрешены только команды управления GitHub Actions.");
   }catch(err){line("ОШИБКА: "+err.message)}
 };
