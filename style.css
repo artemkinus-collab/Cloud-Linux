@@ -10,7 +10,7 @@ button:focus-visible,input:focus-visible{outline:1px solid var(--green);outline-
 .login-panel{position:relative;z-index:1;width:min(420px,100%);max-height:calc(100dvh - 32px);overflow:auto;padding:30px;border:1px solid rgba(91,190,255,.55);border-radius:20px;background:linear-gradient(145deg,rgba(5,24,52,.88),rgba(8,9,34,.88));box-shadow:0 0 0 1px rgba(100,70,255,.15),0 0 55px rgba(0,153,255,.25),inset 0 1px rgba(255,255,255,.12);backdrop-filter:blur(18px)}
 /* Login keeps its own blue glass theme; terminal colors are scoped to the workspace. */
 .login{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:#eaf6ff}
-.login-panel{width:min(390px,100%);max-height:calc(100dvh - 32px);overflow:auto;padding:28px}
+.login-panel{width:min(390px,100%);max-height:calc(100dvh - 32px);overflow:auto;padding:30px;border:1px solid rgba(112,190,255,.62);border-radius:20px;background:linear-gradient(145deg,rgba(5,22,49,.94),rgba(8,12,37,.94));box-shadow:0 20px 80px rgba(0,0,0,.48),0 0 48px rgba(0,145,255,.2),inset 0 1px rgba(255,255,255,.12);backdrop-filter:blur(20px)}
 .login button:focus-visible,.login input:focus-visible{outline:2px solid #39bfff;outline-offset:2px}
 .login .user-picker-trigger{color:#eaf6ff}
 .login .login-input{color:#eaf6ff}
