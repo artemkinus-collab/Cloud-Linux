@@ -53,7 +53,9 @@ function time(s){return s?new Date(s).toLocaleString():"—"}
 async function refresh(){
   const data=await request("/api/runs");
   $("status").textContent="● API подключён · "+data.total_count+" запусков";
-  $("status").style.color="#4ade80";
+  $("status").style.color="#4ce2a0";
+  if($("statusMetric"))$("statusMetric").textContent="Онлайн";
+  if($("runsMetric"))$("runsMetric").textContent=String(data.total_count);
   line("Получено запусков: "+data.total_count);
   for(const r of data.runs.slice(0,8))line("#"+r.id+" "+r.name+" | "+r.status+(r.conclusion?" / "+r.conclusion:"")+" | "+r.branch+" | "+time(r.created_at));
 }
@@ -92,7 +94,8 @@ $("loginBtn").onclick=async()=>{
     $("password").value="";$("otp").value="";
     $("login").hidden=true;$("app").hidden=false;
     $("status").textContent="● Вход выполнен: "+result.user;
-    $("status").style.color="#4ade80";
+    $("status").style.color="#4ce2a0";
+    if($("statusMetric"))$("statusMetric").textContent="Авторизован";
     line("Авторизация успешна · пользователь "+result.user);
     line("Сессия действует ограниченное время и не сохраняется после перезагрузки страницы.");
     await refresh();$("command").focus();
@@ -123,4 +126,5 @@ $("logoutBtn").onclick=()=>{
   sessionToken="";$("app").hidden=true;$("login").hidden=false;
   $("password").value="";$("otp").value="";out.replaceChildren();
   $("status").textContent="● Не подключено";$("loginMsg").textContent="";
+  if($("statusMetric"))$("statusMetric").textContent="Ожидание";
 };
