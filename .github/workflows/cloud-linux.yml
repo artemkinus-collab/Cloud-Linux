@@ -1,0 +1,23 @@
+name: Cloud Linux Diagnostics
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read-only diagnostics
+        run: |
+          echo "Cloud Linux diagnostic runner"
+          date -u
+          uname -a
+          cat /etc/os-release
+          echo "Disk:"
+          df -h
+          echo "Memory:"
+          free -h
+          echo "Workspace:"
+          pwd
+          ls -la
