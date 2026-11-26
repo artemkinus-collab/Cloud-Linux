@@ -1,18 +1,88 @@
 const $=id=>document.getElementById(id);
-let apiBase="",apiKey="";
+let apiBase="https://cloud-linux-api.artemkinus.workers.dev";
+let sessionToken="";
 const out=$("output");
 function line(t,c="result"){const d=document.createElement("div");d.className=c;d.textContent=t;out.append(d);$("terminal").scrollTop=$("terminal").scrollHeight}
-async function api(path,options={}){const r=await fetch(apiBase+path,{...options,headers:{"X-CloudLinux-Key":apiKey,"Content-Type":"application/json",...(options.headers||{})}});const data=await r.json().catch(()=>({error:"Ответ API не является JSON"}));if(!r.ok)throw new Error(data.error||("HTTP "+r.status));return data}
+async function request(path,options={},authenticated=true){
+  const headers={"Content-Type":"application/json",...(options.headers||{})};
+  if(authenticated&&sessionToken)headers.Authorization="Bearer "+sessionToken;
+  const r=await fetch(apiBase+path,{...options,headers});
+  const data=await r.json().catch(()=>({error:"Ответ API не является JSON"}));
+  if(!r.ok)throw new Error(data.error||("HTTP "+r.status));
+  return data;
+}
 function time(s){return s?new Date(s).toLocaleString():"—"}
-async function refresh(){const data=await api("/api/runs");$("status").textContent="● API подключён · "+data.total_count+" запусков";$("status").style.color="#4ade80";line("Получено запусков: "+data.total_count);for(const r of data.runs.slice(0,8)){line("#"+r.id+" "+r.name+" | "+r.status+(r.conclusion?" / "+r.conclusion:"")+" | "+r.branch+" | "+time(r.created_at));}}
-async function run(){const r=await api("/api/dispatch",{method:"POST",body:JSON.stringify({ref:"main"})});line(r.message);setTimeout(()=>refresh().catch(e=>line(e.message)),2500)}
-async function files(){const data=await api("/api/runs");const tree=$("tree");tree.replaceChildren();for(const r of data.runs){const b=document.createElement("button");b.className="artifact-run";b.textContent="▣ Run #"+r.id+" · "+(r.conclusion||r.status)+" · "+time(r.created_at);b.onclick=async()=>{try{const j=await api("/api/runs/"+r.id+"/jobs");tree.querySelectorAll(".job-detail").forEach(x=>x.remove());for(const job of j.jobs){const box=document.createElement("div");box.className="job-detail";box.textContent="📁 "+job.name+" — "+job.status+(job.conclusion?" / "+job.conclusion:"");for(const step of job.steps){const p=document.createElement("div");p.className="step-detail";p.textContent="📄 "+step.name+" — "+step.status+(step.conclusion?" / "+step.conclusion:"");box.append(p)}tree.append(box)}}catch(e){line("Ошибка загрузки заданий: "+e.message)}};tree.append(b)}if(!data.runs.length)tree.textContent="Пока нет запусков."}
-$("loginBtn").onclick=async()=>{const base=$("apiUrl").value.trim().replace(/\/$/,"");const key=$("pass").value;if(!base||!key){$("loginMsg").textContent="Укажи адрес Worker и ключ доступа.";return}apiBase=base;apiKey=key;try{const h=await api("/api/health");$("login").hidden=true;$("app").hidden=false;$("status").textContent="● API подключён";$("status").style.color="#4ade80";line("Подключено к "+h.repository+" · private="+h.private);line("Ветка по умолчанию: "+h.default_branch);await refresh();$("command").focus()}catch(e){apiKey="";$("loginMsg").textContent="Не удалось подключиться: "+e.message}};
-$("commandForm").onsubmit=async e=>{e.preventDefault();const c=$("command").value.trim();if(!c)return;line("Artemkinus@cloudlinux:~$ "+c,"cmdline");$("command").value="";try{if(c==="clear"){out.replaceChildren();return}if(c==="help"){line("Команды: help, status, runs, run, clear. Произвольные команды ОС намеренно не исполняются.");return}if(c==="status"){const h=await api("/api/health");line(JSON.stringify(h,null,2));return}if(c==="runs"){await refresh();return}if(c==="run"){await run();return}line("Неизвестная команда. В этой версии разрешены только команды управления GitHub Actions.")}catch(err){line("ОШИБКА: "+err.message)}};
+async function refresh(){
+  const data=await request("/api/runs");
+  $("status").textContent="● API подключён · "+data.total_count+" запусков";
+  $("status").style.color="#4ade80";
+  line("Получено запусков: "+data.total_count);
+  for(const r of data.runs.slice(0,8))line("#"+r.id+" "+r.name+" | "+r.status+(r.conclusion?" / "+r.conclusion:"")+" | "+r.branch+" | "+time(r.created_at));
+}
+async function run(){
+  const r=await request("/api/dispatch",{method:"POST",body:JSON.stringify({ref:"main"})});
+  line(r.message);
+  setTimeout(()=>refresh().catch(e=>line(e.message)),2500);
+}
+async function files(){
+  const data=await request("/api/runs"),tree=$("tree");tree.replaceChildren();
+  for(const r of data.runs){
+    const b=document.createElement("button");b.className="artifact-run";
+    b.textContent="▣ Run #"+r.id+" · "+(r.conclusion||r.status)+" · "+time(r.created_at);
+    b.onclick=async()=>{
+      try{
+        const j=await request("/api/runs/"+r.id+"/jobs");
+        tree.querySelectorAll(".job-detail").forEach(x=>x.remove());
+        for(const job of j.jobs){
+          const box=document.createElement("div");box.className="job-detail";
+          box.textContent=job.name+" — "+job.status+(job.conclusion?" / "+job.conclusion:"");
+          for(const step of job.steps){const p=document.createElement("div");p.className="step-detail";p.textContent=step.name+" — "+step.status+(step.conclusion?" / "+step.conclusion:"");box.append(p)}
+          tree.append(box);
+        }
+      }catch(e){line("Ошибка загрузки заданий: "+e.message)}
+    };
+    tree.append(b);
+  }
+  if(!data.runs.length)tree.textContent="Пока нет запусков.";
+}
+$("loginBtn").onclick=async()=>{
+  const user=$("user").value,password=$("password").value,otp=$("otp").value;
+  const button=$("loginBtn");button.disabled=true;$("loginMsg").textContent="Проверка данных…";
+  try{
+    const result=await request("/api/login",{method:"POST",body:JSON.stringify({user,password,otp})},false);
+    sessionToken=result.session;
+    $("password").value="";$("otp").value="";
+    $("login").hidden=true;$("app").hidden=false;
+    $("status").textContent="● Вход выполнен: "+result.user;
+    $("status").style.color="#4ade80";
+    line("Авторизация успешна · пользователь "+result.user);
+    line("Сессия действует ограниченное время и не сохраняется после перезагрузки страницы.");
+    await refresh();$("command").focus();
+  }catch(e){sessionToken="";$("loginMsg").textContent="Войти не удалось: "+e.message}
+  finally{button.disabled=false}
+};
+$("password").addEventListener("keydown",e=>{if(e.key==="Enter")$("otp").focus()});
+$("otp").addEventListener("keydown",e=>{if(e.key==="Enter")$("loginBtn").click()});
+$("commandForm").onsubmit=async e=>{
+  e.preventDefault();const c=$("command").value.trim();if(!c)return;
+  line("cloudlinux:~$ "+c,"cmdline");$("command").value="";
+  try{
+    if(c==="clear"){out.replaceChildren();return}
+    if(c==="help"){line("Команды: help, status, runs, run, clear. Произвольные команды ОС не исполняются.");return}
+    if(c==="status"){const h=await request("/api/health");line(JSON.stringify(h,null,2));return}
+    if(c==="runs"){await refresh();return}
+    if(c==="run"){await run();return}
+    line("Неизвестная команда. Разрешены только команды управления GitHub Actions.");
+  }catch(err){line("ОШИБКА: "+err.message)}
+};
 $("runBtn").onclick=()=>run().catch(e=>line("ОШИБКА запуска: "+e.message));
 $("refreshBtn").onclick=()=>refresh().catch(e=>line("ОШИБКА обновления: "+e.message));
-$("filesBtn").onclick=()=>{$("explorer").hidden=false;files().catch(e=>line("ОШИБКА файлового списка: "+e.message))};
+$("filesBtn").onclick=()=>{$("explorer").hidden=false;files().catch(e=>line("ОШИБКА списка: "+e.message))};
 $("loadRuns").onclick=()=>files().catch(e=>line(e.message));
 $("closeFiles").onclick=()=>$("explorer").hidden=true;
 $("explorer").onclick=e=>{if(e.target===$("explorer"))$("explorer").hidden=true};
-$("logoutBtn").onclick=()=>{apiKey="";apiBase="";$("app").hidden=true;$("login").hidden=false;$("pass").value="";out.replaceChildren();$("status").textContent="● Не подключено"};
+$("logoutBtn").onclick=()=>{
+  sessionToken="";$("app").hidden=true;$("login").hidden=false;
+  $("password").value="";$("otp").value="";out.replaceChildren();
+  $("status").textContent="● Не подключено";$("loginMsg").textContent="";
+};
