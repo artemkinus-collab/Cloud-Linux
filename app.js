@@ -109,7 +109,7 @@ $("loginForm").addEventListener("submit",async e=>{
 $("password").addEventListener("keydown",e=>{if(e.key==="Enter")$("otp").focus()});
 $("otp").addEventListener("keydown",e=>{if(e.key==="Enter")$("loginForm").requestSubmit()});
 $("commandForm").onsubmit=async e=>{
- e.preventDefault();const raw=$("command").value.trim(),c=raw.toLowerCase();if(!c)return;line("cloudlinux:~$ "+raw,"cmdline");$("command").value="";
+ e.preventDefault();const raw=$("command").value.trim(),c=raw.toLowerCase();if(!c)return;line("cloudlinux:~$ "+raw,"cmdline");$("command").value="";if(raw.startsWith("#")){line("Комментарий Bash принят как комментарий; команда не выполнялась.");return;}
  try{
   if(c==="clear"){out.replaceChildren();return}
   if(c==="help"){line("Доступные команды:\nhelp — список команд\nstatus — состояние API и GitHub\nruns — последние диагностические запуски\nrun или run full — полная диагностика\nrun storage — проверка хранилища\nrun runtime — сведения об ОС и среде\nclear — очистить экран\n\nПроизвольный shell, sudo и управление хостом не поддерживаются.");return}
