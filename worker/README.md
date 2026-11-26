@@ -9,7 +9,7 @@ Set these in **Cloudflare Dashboard → Workers & Pages → cloud-linux-api → 
 ### Variables
 - `REPO_OWNER` = `artemkinus-collab`
 - `REPO_NAME` = `Cloud-Linux`
-- `ALLOWED_ORIGIN` = `https://artemkinus-collab.github.io` (origin only; no trailing slash and no repository path)
+- Allowed origin is fixed in `worker.js` as `https://artemkinus-collab.github.io`; no Cloudflare variable is needed for it.
 
 ### Secrets
 - `GITHUB_TOKEN` — fine-grained GitHub token with Actions Read and write, Contents Read-only, Metadata Read-only.
@@ -36,4 +36,4 @@ Update `worker.js` in the Cloudflare Worker editor and deploy it. Then set the v
 - The fixed OTP is a convenience, not strong multi-factor authentication; anyone who learns it can reuse it.
 - Use a unique password and rotate it if it has been shared.
 - The Worker currently uses short-lived signed sessions; a reload or logout clears the browser-held token.
-- Keep `ALLOWED_ORIGIN` restricted to the exact GitHub Pages origin.
+- The Worker enforces the exact GitHub Pages origin hardcoded in `worker.js`.
