@@ -18,36 +18,55 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Checkout Cloud Linux workspace
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Generate read-only system report
         shell: bash
         env:
           REPORT_MODE: ${{ inputs.report }}
         run: |
           set -euo pipefail
+          case "$REPORT_MODE" in full|storage|runtime) ;; *) echo "Unsupported report mode"; exit 2 ;; esac
           mkdir -p report
           {
             echo "Cloud Linux diagnostic report"
             echo "Generated (UTC): $(date -u --iso-8601=seconds)"
             echo "Mode: $REPORT_MODE"
+            echo "Repository: $GITHUB_REPOSITORY"
+            echo "Workflow run: $GITHUB_RUN_ID"
             echo
             if [[ "$REPORT_MODE" == "full" || "$REPORT_MODE" == "runtime" ]]; then
               echo "=== OS ==="; cat /etc/os-release
               echo; echo "=== Kernel ==="; uname -a
               echo; echo "=== CPU ==="; lscpu
               echo; echo "=== Memory ==="; free -h
-              echo; echo "=== Runtime ==="; printf 'Bash: '; bash --version | head -n 1
+              echo; echo "=== Runtime ==="
+              printf 'Bash: '; bash --version | head -n 1
               printf 'Python: '; python3 --version
               printf 'Git: '; git --version
+              printf 'Node: '; node --version 2>/dev/null || echo "not installed"
             fi
             if [[ "$REPORT_MODE" == "full" || "$REPORT_MODE" == "storage" ]]; then
-              echo; echo "=== Disk ==="; df -h
+              echo; echo "=== Filesystems ==="; df -hT
+              echo; echo "=== Block devices ==="; lsblk -f 2>/dev/null || true
               echo; echo "=== Workspace ==="; pwd; ls -la
               echo; echo "=== Workspace size ==="; du -sh . 2>/dev/null || true
+              echo; echo "=== Top-level files ==="; find . -maxdepth 2 -type f -not -path './.git/*' -printf '%p (%s bytes)\n' | sort | head -n 100
             fi
           } | tee report/system-report.txt
+          {
+            echo "## Cloud Linux diagnostic report"
+            echo "- **Profile:** $REPORT_MODE"
+            echo "- **Run:** $GITHUB_RUN_ID"
+            echo "- **Generated:** $(date -u --iso-8601=seconds)"
+            echo "- **Artifact:** `cloud-linux-system-report`"
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Upload diagnostic report
         uses: actions/upload-artifact@v4
         with:
           name: cloud-linux-system-report
           path: report/system-report.txt
-          retention-days: 1
+          if-no-files-found: error
+          retention-days: 3
