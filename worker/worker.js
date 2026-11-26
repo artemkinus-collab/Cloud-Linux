@@ -6,7 +6,7 @@ const cors = () => ({
   "Access-Control-Max-Age": "86400",
   "Vary": "Origin"
 });
-function reply(data,status,ALLOWED_ORIGIN){
+function reply(data,status){
   return new Response(JSON.stringify(data),{status,headers:{...cors(),"Content-Type":"application/json","Cache-Control":"no-store"}});
 }
 const enc=new TextEncoder();
@@ -56,7 +56,7 @@ export default {
   const url=new URL(request.url),origin=request.headers.get("Origin")||"";
   if(origin!==ALLOWED_ORIGIN)return new Response("Origin not allowed",{status:403});
   if(request.method==="OPTIONS")return new Response(null,{status:204,headers:cors()});
-  if(!env.GITHUB_TOKEN||!env.REPO_OWNER||!env.REPO_NAME)return reply({error:"Worker configuration incomplete"},503,ALLOWED_ORIGIN);
+  if(!env.GITHUB_TOKEN||!env.REPO_OWNER||!env.REPO_NAME)return reply({error:"Worker configuration incomplete"},503);
   if(url.pathname==="/api/login"&&request.method==="POST"){
     if(!env.ARTEM_PASSWORD||!env.OTP_CODE||!env.SESSION_SECRET)return reply({error:"Authentication secrets are not configured"},503,ALLOWED_ORIGIN);
     const body=await request.json().catch(()=>null);
