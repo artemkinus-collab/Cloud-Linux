@@ -67,7 +67,7 @@ export default {
       return reply({ok:true,repository:repo.full_name,private:repo.private,default_branch:repo.default_branch,api:"online"},200);
     }
     if(url.pathname==="/api/runs"&&request.method==="GET"){
-      const data=await gh(env,base+"/actions/runs?per_page=10");
+      const data=await gh(env,base+"/actions/workflows/cloud-linux.yml/runs?per_page=10");
       return reply({total_count:data.total_count,runs:data.workflow_runs.map(r=>({id:r.id,name:r.name,status:r.status,conclusion:r.conclusion,branch:r.head_branch,created_at:r.created_at,updated_at:r.updated_at,html_url:r.html_url}))},200);
     }
     if(url.pathname==="/api/dispatch"&&request.method==="POST"){
