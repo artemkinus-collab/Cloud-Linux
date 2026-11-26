@@ -8,16 +8,35 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Read-only diagnostics
+      - name: Generate read-only system report
         run: |
-          echo "Cloud Linux diagnostic runner"
-          date -u
-          uname -a
-          cat /etc/os-release
-          echo "Disk:"
-          df -h
-          echo "Memory:"
-          free -h
-          echo "Workspace:"
-          pwd
-          ls -la
+          mkdir -p report
+          {
+            echo "Cloud Linux diagnostic report"
+            echo "Generated (UTC): $(date -u)"
+            echo
+            echo "=== OS ==="
+            cat /etc/os-release
+            echo
+            echo "=== Kernel ==="
+            uname -a
+            echo
+            echo "=== CPU ==="
+            lscpu
+            echo
+            echo "=== Memory ==="
+            free -h
+            echo
+            echo "=== Disk ==="
+            df -h
+            echo
+            echo "=== Workspace ==="
+            pwd
+            ls -la
+          } | tee report/system-report.txt
+      - name: Upload diagnostic report
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloud-linux-system-report
+          path: report/system-report.txt
+          retention-days: 1
