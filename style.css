@@ -8,7 +8,13 @@ button:focus-visible,input:focus-visible{outline:1px solid var(--green);outline-
 .login{position:fixed;inset:0;display:grid;place-items:center;padding:24px;overflow:hidden;background:linear-gradient(115deg,rgba(2,8,22,.42),rgba(4,8,24,.12) 48%,rgba(13,5,30,.42)),url("./assets/login-background.svg") center center/cover no-repeat}
 .login:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 20%,rgba(1,5,17,.42) 100%);pointer-events:none}
 .login-panel{position:relative;z-index:1;width:min(420px,100%);max-height:calc(100dvh - 32px);overflow:auto;padding:30px;border:1px solid rgba(91,190,255,.55);border-radius:20px;background:linear-gradient(145deg,rgba(5,24,52,.88),rgba(8,9,34,.88));box-shadow:0 0 0 1px rgba(100,70,255,.15),0 0 55px rgba(0,153,255,.25),inset 0 1px rgba(255,255,255,.12);backdrop-filter:blur(18px)}
-.login-panel{width:min(390px,100%);max-height:calc(100dvh - 32px);overflow:auto;padding:28px;border:1px solid #14552a;background:#020703;box-shadow:0 0 45px #00ff6610}
+/* Login keeps its own blue glass theme; terminal colors are scoped to the workspace. */
+.login{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:#eaf6ff}
+.login-panel{width:min(390px,100%);max-height:calc(100dvh - 32px);overflow:auto;padding:28px}
+.login button:focus-visible,.login input:focus-visible{outline:2px solid #39bfff;outline-offset:2px}
+.login .user-picker-trigger{color:#eaf6ff}
+.login .login-input{color:#eaf6ff}
+.login .login-input:focus,.login .user-picker-trigger:focus{border-color:#39bfff;box-shadow:0 0 0 3px #168fff22}
 .login-brand{font-size:25px;font-weight:600;letter-spacing:-3px;color:#fff;text-shadow:0 0 18px #00cfff}.login-brand i{font-style:normal;color:#b86cff}
 .login-panel h1{margin:16px 0 4px;font-size:25px;font-weight:600;letter-spacing:.01em;color:#f1f8ff;text-shadow:0 0 22px #238cff66}.login-subtitle{margin:0 0 24px;color:#9bbce5;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
 .login-panel label{display:block;margin:14px 0 7px;color:#b8d5f8;font-size:11px}
