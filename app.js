@@ -2,6 +2,44 @@ const $=id=>document.getElementById(id);
 let apiBase="https://cloud-linux-api.artemkinus.workers.dev";
 let sessionToken="";
 const out=$("output");
+const picker=$("userPicker"),pickerTrigger=$("userPickerTrigger"),pickerMenu=$("userPickerMenu");
+const userDetails={
+  artem:{label:"artem",hint:"Стандартный пользователь",initial:"A"},
+  root:{label:"root",hint:"Системный пользователь",initial:"R"}
+};
+function closeUserPicker(){pickerMenu.hidden=true;pickerTrigger.setAttribute("aria-expanded","false");picker.classList.remove("open")}
+function selectUser(name){
+  const info=userDetails[name];if(!info)return;
+  $("user").value=name;$("selectedUser").textContent=info.label;
+  $("selectedUserHint").textContent=info.hint;$("userAvatar").textContent=info.initial;
+  pickerMenu.querySelectorAll("[data-user]").forEach(option=>{
+    const active=option.dataset.user===name;
+    option.classList.toggle("selected",active);option.setAttribute("aria-selected",String(active));
+  });
+  closeUserPicker();
+}
+pickerTrigger.addEventListener("click",()=>{
+  const opening=pickerMenu.hidden;pickerMenu.hidden=!opening;
+  pickerTrigger.setAttribute("aria-expanded",String(opening));picker.classList.toggle("open",opening);
+});
+pickerMenu.querySelectorAll("[data-user]").forEach(option=>option.addEventListener("click",()=>selectUser(option.dataset.user)));
+document.addEventListener("click",event=>{if(!picker.contains(event.target))closeUserPicker()});
+document.addEventListener("keydown",event=>{
+  if(event.key==="Escape"&&!pickerMenu.hidden){closeUserPicker();pickerTrigger.focus()}
+  if((event.key==="ArrowDown"||event.key==="ArrowUp")&&document.activeElement===pickerTrigger){
+    event.preventDefault();pickerMenu.hidden=false;pickerTrigger.setAttribute("aria-expanded","true");picker.classList.add("open");
+    const options=[...pickerMenu.querySelectorAll("[data-user]")];
+    options[event.key==="ArrowDown"?0:options.length-1].focus();
+  }
+});
+pickerMenu.querySelectorAll("[data-user]").forEach((option,index)=>{
+  option.addEventListener("keydown",event=>{
+    if(event.key==="ArrowDown"||event.key==="ArrowUp"){
+      event.preventDefault();pickerMenu.querySelectorAll("[data-user]")[(index+(event.key==="ArrowDown"?1:-1)+2)%2].focus();
+    }
+  });
+});
+
 function line(t,c="result"){const d=document.createElement("div");d.className=c;d.textContent=t;out.append(d);$("terminal").scrollTop=$("terminal").scrollHeight}
 async function request(path,options={},authenticated=true){
   const headers={"Content-Type":"application/json",...(options.headers||{})};
