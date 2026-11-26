@@ -3,52 +3,64 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Cloud Linux</title>
+  <meta name="theme-color" content="#070b16">
+  <meta name="description" content="Cloud Linux — защищённая облачная консоль управления и диагностики.">
+  <title>Cloud Linux — Secure Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <section id="login" class="login">
-  <div class="login-card">
-    <div class="logo">CL</div>
-    <h1>Cloud Linux</h1>
-    <p>Вход в защищённую систему</p>
-    <label id="userLabel">Пользователь</label>
-    <input id="user" type="hidden" value="artem" autocomplete="username">
-    <div class="user-picker" id="userPicker">
-      <button class="user-picker-trigger" id="userPickerTrigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="userLabel selectedUser">
-        <span class="user-avatar" id="userAvatar">A</span>
-        <span class="user-picker-copy"><strong id="selectedUser">artem</strong><small id="selectedUserHint">Стандартный пользователь</small></span>
-        <svg class="user-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg>
-      </button>
-      <div class="user-picker-menu" id="userPickerMenu" role="listbox" aria-labelledby="userLabel" hidden>
-        <button class="user-option selected" type="button" role="option" aria-selected="true" data-user="artem">
-          <span class="user-avatar">A</span><span class="user-option-copy"><strong>artem</strong><small>Стандартный пользователь</small></span><span class="user-check">✓</span>
-        </button>
-        <button class="user-option" type="button" role="option" aria-selected="false" data-user="root">
-          <span class="user-avatar root-avatar">R</span><span class="user-option-copy"><strong>root</strong><small>Системный пользователь</small></span><span class="user-check">✓</span>
-        </button>
+  <div class="login-grid" aria-hidden="true"></div>
+  <div class="login-shell">
+    <div class="login-art">
+      <div class="art-top"><span class="brand-mark">CL<span>_</span></span><span class="live-chip"><i></i> SECURE ENVIRONMENT</span></div>
+      <div class="art-copy"><span class="eyebrow">CLOUD INFRASTRUCTURE / 01</span><h1>Ваша система.<br><em>Ваш контроль.</em></h1><p>Единая точка доступа к диагностике, истории запусков и облачным инструментам Cloud Linux.</p></div>
+      <div class="art-visual">
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <div class="cloud-core"><span class="cloud-symbol">☁</span><b>CL</b><small>CONNECTED</small></div>
+        <div class="floating-terminal"><div class="terminal-dots"><i></i><i></i><i></i><span>cloudlinux://system</span></div><code><span>root@cloud</span>:~$ system status<br><strong>● secure environment ready</strong><br><span>root@cloud</span>:~$ <i class="cursor"></i></code></div>
+        <div class="visual-tag tag-a"><span>01</span> ENCRYPTED SESSION</div><div class="visual-tag tag-b"><span>02</span> CLOUD POWERED</div>
       </div>
+      <div class="art-bottom"><span><b>01</b> Защищённый доступ</span><span><b>02</b> Серверная проверка</span><span><b>03</b> Live diagnostics</span></div>
     </div>
-    <label for="password">Пароль</label>
-    <input id="password" type="password" autocomplete="current-password" placeholder="Введите пароль">
-    <label for="otp">OTP-код</label>
-    <input id="otp" type="password" autocomplete="one-time-code" placeholder="Введите OTP-код">
-    <button id="loginBtn" type="button">Войти</button>
-    <p id="loginMsg" class="msg" role="status"></p>
-    <small>Пароль и OTP проверяются сервером. Сессия хранится только в памяти этой вкладки.</small>
+    <div class="login-panel">
+      <div class="panel-heading"><div class="panel-icon">⌘</div><div><span class="eyebrow">AUTHENTICATION GATE</span><h2>Вход в систему</h2><p>Подтвердите учётные данные для продолжения</p></div></div>
+      <div class="secure-note"><span class="shield">⬡</span><span><b>Защищённое соединение</b><small>Данные проверяются на сервере</small></span><span class="secure-dot"></span></div>
+      <label id="userLabel" for="userPickerTrigger">Пользователь</label>
+      <input id="user" type="hidden" value="artem" autocomplete="username">
+      <div class="user-picker" id="userPicker">
+        <button class="user-picker-trigger" id="userPickerTrigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="userLabel selectedUser">
+          <span class="user-avatar" id="userAvatar">A</span><span class="user-picker-copy"><strong id="selectedUser">artem</strong><small id="selectedUserHint">Стандартный пользователь</small></span><svg class="user-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg>
+        </button>
+        <div class="user-picker-menu" id="userPickerMenu" role="listbox" aria-labelledby="userLabel" hidden>
+          <button class="user-option selected" type="button" role="option" aria-selected="true" data-user="artem"><span class="user-avatar">A</span><span class="user-option-copy"><strong>artem</strong><small>Стандартный пользователь</small></span><span class="user-check">✓</span></button>
+          <button class="user-option" type="button" role="option" aria-selected="false" data-user="root"><span class="user-avatar root-avatar">R</span><span class="user-option-copy"><strong>root</strong><small>Системный пользователь</small></span><span class="user-check">✓</span></button>
+        </div>
+      </div>
+      <label for="password">Пароль</label><div class="field-wrap"><span class="field-icon">⌑</span><input id="password" type="password" autocomplete="current-password" placeholder="Введите пароль"></div>
+      <label for="otp">Одноразовый код <span class="label-hint">OTP</span></label><div class="field-wrap"><span class="field-icon">◈</span><input id="otp" type="password" autocomplete="one-time-code" placeholder="Введите код подтверждения"></div>
+      <button id="loginBtn" type="button"><span>Войти в Cloud Linux</span><b>↗</b></button>
+      <p id="loginMsg" class="msg" role="status" aria-live="polite"></p>
+      <div class="panel-foot"><span>◉</span><p>Сессия хранится только в памяти этой вкладки и не переживает перезагрузку страницы.</p></div>
+      <div class="version-line"><span>CLOUD LINUX</span><span>BUILD 1.0.0</span><span>© 2026</span></div>
+    </div>
   </div>
 </section>
 <main id="app" hidden>
-  <header>
-    <div class="brand"><span class="logo small">CL</span><b>Cloud Linux</b><span class="status" id="status">● Не подключено</span></div>
-    <div class="tools"><button id="runBtn">▶ Запустить диагностику</button><button id="filesBtn">▣ Файлы</button><button id="refreshBtn" title="Обновить">↻</button><button id="logoutBtn">Выход</button></div>
+  <header class="app-header">
+    <div class="brand"><span class="logo small">CL<span>_</span></span><b>Cloud Linux</b><span class="header-divider"></span><span class="workspace-label">WORKSPACE / MAIN</span><span class="status" id="status">● Не подключено</span></div>
+    <div class="tools"><button id="runBtn" class="primary-tool">▶ <span>Запустить диагностику</span></button><button id="filesBtn">▤ <span>История</span></button><button id="refreshBtn" title="Обновить" aria-label="Обновить">↻</button><button id="logoutBtn" class="logout-tool">Выход ↗</button></div>
   </header>
-  <section class="terminal" id="terminal">
-    <div class="welcome"><h2>Cloud Linux Terminal</h2><p>Подключённый терминал управления GitHub Actions.</p><p>Команды интерфейса: help, status, runs, run, clear. Это не произвольная Linux shell.</p></div>
-    <div id="output"></div>
-    <form id="commandForm"><span class="prompt">cloudlinux:~$</span><input id="command" spellcheck="false" autocomplete="off" aria-label="Команда"><button>↵</button></form>
+  <section class="dashboard">
+    <div class="dashboard-intro"><div><span class="eyebrow">SYSTEM OVERVIEW / 01</span><h1>Рабочая область</h1><p>Управление диагностикой и состоянием облачной инфраструктуры.</p></div><div class="system-pill"><i></i> CLOUD ENVIRONMENT</div></div>
+    <div class="metric-grid"><article class="metric-card"><span>СИСТЕМНЫЙ СТАТУС</span><b id="statusMetric">Ожидание</b><small>Подключение API</small><i>◉</i></article><article class="metric-card"><span>ИСТОРИЯ ЗАПУСКОВ</span><b id="runsMetric">—</b><small>GitHub Actions</small><i>▤</i></article><article class="metric-card"><span>ТЕКУЩИЙ РЕЖИМ</span><b>Secure</b><small>Ограниченная консоль</small><i>⬡</i></article></div>
+    <section class="terminal-card" id="terminal"><div class="terminal-head"><div><span class="terminal-symbol">⌘</span><div><b>Cloud Linux Terminal</b><small>Управление и диагностика</small></div></div><div class="terminal-state"><i></i> SESSION ACTIVE</div></div><div class="welcome"><h2>Добро пожаловать в Cloud Linux</h2><p>Подключённый терминал управления GitHub Actions.</p><p>Команды: <code>help</code>, <code>status</code>, <code>runs</code>, <code>run</code>, <code>clear</code>. Произвольный shell не поддерживается.</p></div><div id="output"></div><form id="commandForm"><span class="prompt">cloudlinux:~$</span><input id="command" spellcheck="false" autocomplete="off" aria-label="Команда" placeholder="Введите команду…"><button aria-label="Выполнить команду">↵</button></form></section>
+    <footer class="app-footer"><span>Cloud Linux <b>•</b> Secure workspace</span><span>СЕССИЯ ХРАНИТСЯ ЛОКАЛЬНО ВО ВКЛАДКЕ</span></footer>
   </section>
-  <div id="explorer" class="overlay" hidden><section class="explorer"><div class="explorer-head"><b>Файловый менеджер · история запусков</b><button id="closeFiles">✕</button></div><div class="nav"><span id="path">/artifacts</span><button id="loadRuns">Обновить список</button></div><div id="tree" class="tree"><p class="note">Здесь появятся диагностические запуски.</p></div></section></div>
+  <div id="explorer" class="overlay" hidden><section class="explorer"><div class="explorer-head"><div><span class="eyebrow">RUN HISTORY</span><b>История запусков</b></div><button id="closeFiles" aria-label="Закрыть">✕</button></div><div class="nav"><span id="path">/artifacts</span><button id="loadRuns">↻ Обновить список</button></div><div id="tree" class="tree"><p class="note">Здесь появятся диагностические запуски.</p></div></section></div>
 </main>
 <script src="app.js"></script>
 </body>
