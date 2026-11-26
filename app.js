@@ -59,9 +59,9 @@ async function refresh(){
   line("Получено запусков: "+data.total_count);
   for(const r of data.runs.slice(0,8))line("#"+r.id+" "+r.name+" | "+r.status+(r.conclusion?" / "+r.conclusion:"")+" | "+r.branch+" | "+time(r.created_at));
 }
-async function run(){
-  const r=await request("/api/dispatch",{method:"POST",body:JSON.stringify({ref:"main"})});
-  line(r.message);
+async function run(mode="full"){
+  const r=await request("/api/dispatch",{method:"POST",body:JSON.stringify({ref:"main",report:mode})});
+  line(r.message+" · профиль: "+mode);
   setTimeout(()=>refresh().catch(e=>line(e.message)),2500);
 }
 async function files(){
@@ -109,10 +109,10 @@ $("commandForm").onsubmit=async e=>{
   line("cloudlinux:~$ "+c,"cmdline");$("command").value="";
   try{
     if(c==="clear"){out.replaceChildren();return}
-    if(c==="help"){line("Команды: help, status, runs, run, clear. Произвольные команды ОС не исполняются.");return}
+    if(c==="help"){line("Команды Cloud Linux:\\nhelp — справка\\nstatus — состояние API и репозитория\\nruns — последние запуски Actions\\nrun — полная диагностика\\nrun storage — проверка дисков и рабочей папки\\nrun runtime — сведения об ОС, ядре и среде выполнения\\nclear — очистить вывод\\nПроизвольный shell и sudo не поддерживаются.");return}
     if(c==="status"){const h=await request("/api/health");line(JSON.stringify(h,null,2));return}
     if(c==="runs"){await refresh();return}
-    if(c==="run"){await run();return}
+    if(c==="run"||c==="run full"){await run("full");return}\n    if(c==="run storage"){await run("storage");return}\n    if(c==="run runtime"){await run("runtime");return}
     line("Неизвестная команда. Разрешены только команды управления GitHub Actions.");
   }catch(err){line("ОШИБКА: "+err.message)}
 };
