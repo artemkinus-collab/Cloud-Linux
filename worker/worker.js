@@ -62,6 +62,21 @@ export default {
     return reply({error:"Сессия недействительна или истекла. Войдите снова."},401);
   const base="/repos/"+encodeURIComponent(env.REPO_OWNER)+"/"+encodeURIComponent(env.REPO_NAME);
   try{
+    if(url.pathname==="/api/files"&&request.method==="GET"){
+      const requested=(url.searchParams.get("path")||"").replace(/^\\/+|\\/+$/g,"");
+      if(requested.split("/").some(part=>part===".."||part==="."))return reply({error:"Invalid path"},400);
+      const target=base+"/contents"+(requested?"/"+requested:"")+"?ref=main";
+      const data=await gh(env,target);
+      if(Array.isArray(data)){
+        return reply({path:requested,kind:"directory",entries:data.map(item=>({name:item.name,path:item.path,type:item.type,size:item.size||0,download_url:item.download_url||null,html_url:item.html_url||null})).sort((a,b)=>a.type===b.type?a.name.localeCompare(b.name):a.type==="dir"?-1:1)},200);
+      }
+      if(data&&data.type==="file"){
+        const decoded=atob((data.content||"").replace(/\\s/g,""));
+        const bytes=Uint8Array.from(decoded,c=>c.charCodeAt(0));
+        return reply({path:data.path,kind:"file",name:data.name,size:data.size,encoding:data.encoding,content:new TextDecoder().decode(bytes),html_url:data.html_url},200);
+      }
+      return reply({error:"Unsupported GitHub content type"},415);
+    }
     if(url.pathname==="/api/health"&&request.method==="GET"){
       const repo=await gh(env,base);
       return reply({ok:true,repository:repo.full_name,private:repo.private,default_branch:repo.default_branch,api:"online"},200);
