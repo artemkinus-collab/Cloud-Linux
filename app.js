@@ -64,12 +64,12 @@ async function showHistory(){
   b.onclick=async()=>{
    details.replaceChildren();const status=document.createElement("p");status.className="note";status.textContent="Загрузка деталей…";details.append(status);
    try{
-    const [jobs,artifacts]=await Promise.all([request("/api/runs/"+r.id+"/jobs"),request("/api/runs/"+r.id+"/artifacts")]);details.replaceChildren();
-    for(const job of jobs.jobs){const box=document.createElement("div");box.className="job-detail";box.textContent=job.name+" — "+job.status+(job.conclusion?" / "+job.conclusion:"");
+    const jobsResult=await request("/api/runs/"+r.id+"/jobs");let artifactsResult={artifacts:[]},artifactError="";try{artifactsResult=await request("/api/runs/"+r.id+"/artifacts")}catch(err){artifactError=err.message}details.replaceChildren();
+    for(const job of jobsResult.jobs){const box=document.createElement("div");box.className="job-detail";box.textContent=job.name+" — "+job.status+(job.conclusion?" / "+job.conclusion:"");
      for(const step of job.steps){const p=document.createElement("div");p.className="step-detail";p.textContent=step.name+" — "+step.status+(step.conclusion?" / "+step.conclusion:"");box.append(p)}details.append(box)}
-    for(const artifact of artifacts.artifacts){const row=document.createElement("div");row.className="artifact-row";const info=document.createElement("span");info.textContent=artifact.name+" · "+(artifact.size_in_bytes/1024).toFixed(1)+" KB";
+    for(const artifact of artifactsResult.artifacts){const row=document.createElement("div");row.className="artifact-row";const info=document.createElement("span");info.textContent=artifact.name+" · "+(artifact.size_in_bytes/1024).toFixed(1)+" KB";
      const dl=document.createElement("button");dl.className="download-artifact";dl.textContent=artifact.expired?"Срок хранения истёк":"Скачать ZIP";dl.disabled=artifact.expired;dl.onclick=()=>downloadArtifact(artifact.id).catch(e=>line("Ошибка скачивания: "+e.message));row.append(info,dl);details.append(row)}
-    if(!artifacts.artifacts.length){const p=document.createElement("p");p.className="note";p.textContent="Отчёт для этого запуска отсутствует.";details.append(p)}
+    if(!artifactsResult.artifacts.length){const p=document.createElement("p");p.className="note";p.textContent=artifactError?"Артефакты недоступны: "+artifactError:"Отчёт для этого запуска отсутствует.";details.append(p)}
    }catch(e){details.replaceChildren();const p=document.createElement("p");p.className="note";p.textContent="Ошибка: "+e.message;details.append(p)}
   };
   const link=document.createElement("a");link.className="run-link";link.href=r.html_url;link.target="_blank";link.rel="noopener noreferrer";link.textContent="GitHub ↗";
@@ -77,19 +77,21 @@ async function showHistory(){
  }
  if(!data.runs.length)tree.textContent="Запусков пока нет.";
 }
-async function showFiles(){
- $("explorerTitle").textContent="Файлы";$("explorer").hidden=false;
- const tree=$("tree");tree.replaceChildren();const data=await getRuns();let count=0;
- for(const r of data.runs){
-  const artifacts=await request("/api/runs/"+r.id+"/artifacts");
-  for(const artifact of artifacts.artifacts){
-   count++;const row=document.createElement("div");row.className="artifact-row";
-   const info=document.createElement("span");info.textContent=artifact.name+" · Run #"+r.id+" · "+(artifact.size_in_bytes/1024).toFixed(1)+" KB";
-   const dl=document.createElement("button");dl.className="download-artifact";dl.textContent=artifact.expired?"Истёк срок":"Скачать ZIP";dl.disabled=artifact.expired;dl.onclick=()=>downloadArtifact(artifact.id).catch(e=>line("Ошибка скачивания: "+e.message));
-   row.append(info,dl);tree.append(row);
-  }
- }
- if(!count)tree.textContent="Файлы пока не созданы. Сначала запустите диагностику.";
+async function showFiles(path=""){
+ $("explorerTitle").textContent="Файлы проекта";$("explorer").hidden=false;
+ const tree=$("tree");tree.replaceChildren();
+ const toolbar=document.createElement("div");toolbar.className="file-toolbar";
+ const crumb=document.createElement("span");crumb.className="note";crumb.textContent="/"+(path||"");
+ const up=document.createElement("button");up.className="download-artifact";up.textContent="На уровень выше";up.disabled=!path;up.onclick=()=>showFiles(path.split("/").slice(0,-1).join("/"));
+ toolbar.append(crumb,up);tree.append(toolbar);
+ const heading=document.createElement("p");heading.className="note";heading.textContent="Репозиторий Cloud-Linux · ветка main · режим только чтение";tree.append(heading);
+ try{
+  const data=await request("/api/files"+(path?"?path="+encodeURIComponent(path):""));
+  if(data.kind==="file"){const back=document.createElement("button");back.className="download-artifact";back.textContent="← К списку";back.onclick=()=>showFiles(path.split("/").slice(0,-1).join("/"));tree.append(back);const pre=document.createElement("pre");pre.className="file-preview";pre.textContent=data.content||"(пустой файл)";tree.append(pre);return}
+  if(!data.entries.length){const empty=document.createElement("p");empty.className="note";empty.textContent="В этой папке пока нет файлов.";tree.append(empty)}
+  for(const item of data.entries){const row=document.createElement("div");row.className="artifact-row";const info=document.createElement("span");info.textContent=(item.type==="dir"?"▸  ":"▤  ")+item.name+(item.type==="file"?" · "+item.size+" байт":"");const open=document.createElement("button");open.className="download-artifact";open.textContent=item.type==="dir"?"Открыть":"Просмотр";open.onclick=()=>showFiles(item.path);row.append(info,open);tree.append(row)}
+  const separator=document.createElement("p");separator.className="note";separator.textContent="Артефакты временных Linux-исполнителей находятся в «История» → выберите запуск → скачайте ZIP.";tree.append(separator);
+ }catch(e){const error=document.createElement("p");error.className="note";error.textContent="Не удалось загрузить файлы проекта: "+e.message;tree.append(error)}
 }
 $("loginForm").addEventListener("submit",async e=>{
  e.preventDefault();const user=$("user").value,password=$("password").value,otp=$("otp").value,button=$("loginBtn");
