@@ -12,11 +12,23 @@
     <div class="logo">CL</div>
     <h1>Cloud Linux</h1>
     <p>Вход в защищённую систему</p>
-    <label for="user">Пользователь</label>
-    <select id="user" autocomplete="username">
-      <option value="artem">artem</option>
-      <option value="root">root</option>
-    </select>
+    <label id="userLabel">Пользователь</label>
+    <input id="user" type="hidden" value="artem" autocomplete="username">
+    <div class="user-picker" id="userPicker">
+      <button class="user-picker-trigger" id="userPickerTrigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="userLabel selectedUser">
+        <span class="user-avatar" id="userAvatar">A</span>
+        <span class="user-picker-copy"><strong id="selectedUser">artem</strong><small id="selectedUserHint">Стандартный пользователь</small></span>
+        <svg class="user-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg>
+      </button>
+      <div class="user-picker-menu" id="userPickerMenu" role="listbox" aria-labelledby="userLabel" hidden>
+        <button class="user-option selected" type="button" role="option" aria-selected="true" data-user="artem">
+          <span class="user-avatar">A</span><span class="user-option-copy"><strong>artem</strong><small>Стандартный пользователь</small></span><span class="user-check">✓</span>
+        </button>
+        <button class="user-option" type="button" role="option" aria-selected="false" data-user="root">
+          <span class="user-avatar root-avatar">R</span><span class="user-option-copy"><strong>root</strong><small>Системный пользователь</small></span><span class="user-check">✓</span>
+        </button>
+      </div>
+    </div>
     <label for="password">Пароль</label>
     <input id="password" type="password" autocomplete="current-password" placeholder="Введите пароль">
     <label for="otp">OTP-код</label>
