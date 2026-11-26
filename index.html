@@ -17,7 +17,7 @@
   <div class="login-shell">
     <div class="login-art">
       <div class="art-top"><span class="brand-mark">CL<span>_</span></span><span class="live-chip"><i></i> SECURE ENVIRONMENT</span></div>
-      <div class="art-copy"><span class="eyebrow">CLOUD INFRASTRUCTURE / 01</span><h1>Ваша система.<br><em>Ваш контроль.</em></h1><p>Единая точка доступа к диагностике, истории запусков и облачным инструментам Cloud Linux.</p></div>
+      <div class="art-copy"><span class="eyebrow">CLOUD INFRASTRUCTURE / 01</span><h1>Ваша система.<br><em>Ваш контроль.</em></h1><p>Диагностика временной Linux-среды, история запусков и скачиваемые системные отчёты.</p></div>
       <div class="art-visual">
         <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
         <div class="cloud-core"><span class="cloud-symbol">☁</span><b>CL</b><small>CONNECTED</small></div>
@@ -57,10 +57,10 @@
   <section class="dashboard">
     <div class="dashboard-intro"><div><span class="eyebrow">SYSTEM OVERVIEW / 01</span><h1>Рабочая область</h1><p>Управление диагностикой и состоянием облачной инфраструктуры.</p></div><div class="system-pill"><i></i> CLOUD ENVIRONMENT</div></div>
     <div class="metric-grid"><article class="metric-card"><span>СИСТЕМНЫЙ СТАТУС</span><b id="statusMetric">Ожидание</b><small>Подключение API</small><i>◉</i></article><article class="metric-card"><span>ИСТОРИЯ ЗАПУСКОВ</span><b id="runsMetric">—</b><small>GitHub Actions</small><i>▤</i></article><article class="metric-card"><span>ТЕКУЩИЙ РЕЖИМ</span><b>Secure</b><small>Ограниченная консоль</small><i>⬡</i></article></div>
-    <section class="terminal-card" id="terminal"><div class="terminal-head"><div><span class="terminal-symbol">⌘</span><div><b>Cloud Linux Terminal</b><small>Управление и диагностика</small></div></div><div class="terminal-state"><i></i> SESSION ACTIVE</div></div><div class="welcome"><h2>Добро пожаловать в Cloud Linux</h2><p>Подключённый терминал управления GitHub Actions.</p><p>Команды: <code>help</code>, <code>status</code>, <code>runs</code>, <code>run</code>, <code>clear</code>. Произвольный shell не поддерживается.</p></div><div id="output"></div><form id="commandForm"><span class="prompt">cloudlinux:~$</span><input id="command" spellcheck="false" autocomplete="off" aria-label="Команда" placeholder="Введите команду…"><button aria-label="Выполнить команду">↵</button></form></section>
+    <section class="terminal-card" id="terminal"><div class="terminal-head"><div><span class="terminal-symbol">⌘</span><div><b>Cloud Linux Terminal</b><small>Управление и диагностика</small></div></div><div class="terminal-state"><i></i> SESSION ACTIVE</div></div><div class="welcome"><h2>Добро пожаловать в Cloud Linux</h2><p>Безопасные команды запуска фиксированных диагностических профилей.</p><p>Команды: <code>help</code>, <code>status</code>, <code>runs</code>, <code>run</code>, <code>clear</code>. Произвольный shell не поддерживается.</p></div><div id="output"></div><form id="commandForm"><span class="prompt">cloudlinux:~$</span><input id="command" spellcheck="false" autocomplete="off" aria-label="Команда" placeholder="Введите команду…"><button aria-label="Выполнить команду">↵</button></form></section>
     <footer class="app-footer"><span>Cloud Linux <b>•</b> Secure workspace</span><span>СЕССИЯ ХРАНИТСЯ ЛОКАЛЬНО ВО ВКЛАДКЕ</span></footer>
   </section>
-  <div id="explorer" class="overlay" hidden><section class="explorer"><div class="explorer-head"><div><span class="eyebrow">RUN HISTORY</span><b>История запусков</b></div><button id="closeFiles" aria-label="Закрыть">✕</button></div><div class="nav"><span id="path">/artifacts</span><button id="loadRuns">↻ Обновить список</button></div><div id="tree" class="tree"><p class="note">Здесь появятся диагностические запуски.</p></div></section></div>
+  <div id="explorer" class="overlay" hidden><section class="explorer"><div class="explorer-head"><div><span class="eyebrow">RUN HISTORY</span><b>История запусков</b></div><button id="closeFiles" aria-label="Закрыть">✕</button></div><div class="nav"><span id="path">/artifacts</span><button id="loadRuns">↻ Обновить список</button></div><div id="tree" class="tree"><p class="note">Выберите запуск, чтобы посмотреть шаги и скачать ZIP-отчёт.</p></div></section></div>
 </main>
 <script src="app.js"></script>
 </body>
