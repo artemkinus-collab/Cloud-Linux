@@ -1,24 +1,39 @@
 # Cloud Linux Worker API
 
-This Cloudflare Worker is a small authenticated proxy between the static HTML terminal and GitHub Actions.
+Cloudflare Worker API for the static Cloud Linux interface.
 
-## Required Worker secrets / variables
-- `GITHUB_TOKEN` — fine-grained GitHub PAT for this private repository; repository permissions: Actions **Read and write**, Contents **Read-only**, Metadata **Read-only**.
-- `ACCESS_KEY` — a new long random key used by the UI. Do not reuse your GitHub password.
+## Required variables and secrets
+
+Set these in **Cloudflare Dashboard → Workers & Pages → cloud-linux-api → Settings → Variables and Secrets**.
+
+### Variables
 - `REPO_OWNER` = `artemkinus-collab`
 - `REPO_NAME` = `Cloud-Linux`
-- `ALLOWED_ORIGIN` = exact origin where the HTML UI is hosted, e.g. `https://<your-worker-or-pages-domain>` (set after hosting; for local testing you can temporarily leave it unset).
+- `ALLOWED_ORIGIN` = `https://artemkinus-collab.github.io` (origin only; no trailing slash and no repository path)
+
+### Secrets
+- `GITHUB_TOKEN` — fine-grained GitHub token with Actions Read and write, Contents Read-only, Metadata Read-only.
+- `ARTEM_PASSWORD` — the single password shared by the two accepted login names, `root` and `artem`.
+- `OTP_CODE` — the fixed OTP value configured by the owner.
+- `SESSION_SECRET` — a long random secret used only to sign one-hour session tokens. Never put it in the website or GitHub repository.
+
+The login form accepts either `root` or `artem`; both use the same `ARTEM_PASSWORD` and `OTP_CODE`. A successful login returns a signed session token that remains only in browser memory. Reloading the page or logging out requires signing in again.
 
 ## Routes
-- `GET /api/health` — verifies protected GitHub access.
+- `POST /api/login` — verifies username, password and OTP; returns a signed session.
+- `GET /api/health` — checks protected GitHub access.
 - `GET /api/runs` — latest 10 workflow runs.
 - `POST /api/dispatch` — starts the fixed diagnostics workflow on `main`.
 - `GET /api/runs/:id/jobs` — job and step states.
 
-Every route requires `X-CloudLinux-Key`. The GitHub token remains server-side.
+All routes except login require a valid signed session. The GitHub token, password, OTP and session-signing secret stay server-side.
 
 ## Deploy
-Create a Cloudflare Worker, paste `worker.js`, add the variables/secrets above, then deploy. Configure the UI with the Worker URL and the same ACCESS_KEY.
+Update `worker.js` in the Cloudflare Worker editor and deploy it. Then set the variables and secrets listed above. GitHub Pages deploys the static site automatically when its Pages workflow runs.
 
-## Security limits
-This is not a general-purpose remote shell. It intentionally does not accept arbitrary shell commands. GitHub-hosted runners are temporary and are destroyed after each job. Never expose the Worker without a strong ACCESS_KEY and an origin restriction.
+## Security notes
+- This is not a general-purpose remote shell.
+- The fixed OTP is a convenience, not strong multi-factor authentication; anyone who learns it can reuse it.
+- Use a unique password and rotate it if it has been shared.
+- The Worker currently uses short-lived signed sessions; a reload or logout clears the browser-held token.
+- Keep `ALLOWED_ORIGIN` restricted to the exact GitHub Pages origin.
