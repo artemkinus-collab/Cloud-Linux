@@ -1,6 +1,16 @@
 name: Cloud Linux Diagnostics
 on:
   workflow_dispatch:
+    inputs:
+      report:
+        description: "Диагностический отчёт"
+        required: true
+        type: choice
+        options:
+          - full
+          - storage
+          - runtime
+        default: full
 permissions:
   contents: read
 jobs:
@@ -9,30 +19,31 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Generate read-only system report
+        shell: bash
+        env:
+          REPORT_MODE: ${{ inputs.report }}
         run: |
+          set -euo pipefail
           mkdir -p report
           {
             echo "Cloud Linux diagnostic report"
-            echo "Generated (UTC): $(date -u)"
+            echo "Generated (UTC): $(date -u --iso-8601=seconds)"
+            echo "Mode: $REPORT_MODE"
             echo
-            echo "=== OS ==="
-            cat /etc/os-release
-            echo
-            echo "=== Kernel ==="
-            uname -a
-            echo
-            echo "=== CPU ==="
-            lscpu
-            echo
-            echo "=== Memory ==="
-            free -h
-            echo
-            echo "=== Disk ==="
-            df -h
-            echo
-            echo "=== Workspace ==="
-            pwd
-            ls -la
+            if [[ "$REPORT_MODE" == "full" || "$REPORT_MODE" == "runtime" ]]; then
+              echo "=== OS ==="; cat /etc/os-release
+              echo; echo "=== Kernel ==="; uname -a
+              echo; echo "=== CPU ==="; lscpu
+              echo; echo "=== Memory ==="; free -h
+              echo; echo "=== Runtime ==="; printf 'Bash: '; bash --version | head -n 1
+              printf 'Python: '; python3 --version
+              printf 'Git: '; git --version
+            fi
+            if [[ "$REPORT_MODE" == "full" || "$REPORT_MODE" == "storage" ]]; then
+              echo; echo "=== Disk ==="; df -h
+              echo; echo "=== Workspace ==="; pwd; ls -la
+              echo; echo "=== Workspace size ==="; du -sh . 2>/dev/null || true
+            fi
           } | tee report/system-report.txt
       - name: Upload diagnostic report
         uses: actions/upload-artifact@v4
